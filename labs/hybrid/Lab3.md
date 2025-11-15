@@ -25,13 +25,16 @@ This required generating a valid SSL certificate, so I used **win-acme** to issu
 
 2. **Created an A record on my DNS provider**  
    I mapped **sea-svr1.engineerleite.com** to my public IP, since WAC would run on SEA-SVR1.
+   ![RecordA](./images/RecordA.png)
 
 3. **Configured internal name resolution**  
    SEA-DC1 also needed to resolve *sea-svr1.engineerleite.com*.  
    I added a corresponding entry pointing to the public IP, ensuring consistent resolution from inside the lab network.
+   ![ConditionalForwarding](./images/CF_resolution.png)
 
 4. **Issued an SSL certificate using win-acme**  
    I selected this tool because it is free and supports automated Let’s Encrypt certificate creation.
+   ![win-acmeInstallation](./images/win-acmeInstallation.png)
 
 5. **Installed Windows Admin Center using the certificate’s thumbprint**  
    During installation, I specified the generated certificate so WAC could serve HTTPS correctly.
@@ -39,9 +42,11 @@ This required generating a valid SSL certificate, so I used **win-acme** to issu
 6. **Verified WAC was accessible**  
    WAC opened successfully.  
    I still received a minor security warning—some internal WAC calls use HTTP, which makes the browser treat the connection as partially non-secure, even though the certificate itself was valid.
+   ![](./images/WAC_Dashboard.png)
 
 7. **Added additional servers to WAC**  
    Once WAC was running, I onboarded the remaining servers in my environment.
+   ![](./images/Added_Servers_WAC.png)
 
 8. **Configured proper authentication for extension management**  
    While attempting to install extensions, I learned WAC requires a **domain admin**-level account.  
@@ -49,9 +54,11 @@ This required generating a valid SSL certificate, so I used **win-acme** to issu
 
 9. **Installed the DNS extension**  
    Using WACUser, I accessed the Extensions Marketplace and successfully installed the DNS extension to manage SEA-DC1 remotely.
+   ![](./images/WAC_DNS_Extension.png)
 
 10. **Tested PowerShell remoting through WAC**  
    With WACUser, I used WAC’s PowerShell module to inspect services on SEA-SVR1, confirming successful remote administration.
+   ![](./images/PSRemoting.png)
 
 ## Troubleshooting / Errors Encountered
 
