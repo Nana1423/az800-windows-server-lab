@@ -21,6 +21,7 @@ This required generating a valid SSL certificate, so I used **win-acme** to issu
 
 1. **Identified my public IP address**  
    This was required so I could configure DNS and ensure external access to the WAC endpoint.
+   ![Retrieving the Public IP address](./images/PublicIPAddress.png)
 
 2. **Created an A record on my DNS provider**  
    I mapped **sea-svr1.engineerleite.com** to my public IP, since WAC would run on SEA-SVR1.
