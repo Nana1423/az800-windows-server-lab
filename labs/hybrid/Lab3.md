@@ -11,8 +11,6 @@ In this lab, I worked with several key AZ-800 skills:
 - Installing and configuring Windows Admin Center.
 - Adding on-premises servers for remote administration.
 - Configuring and using WAC extensions such as DNS.
-- Managing servers using Remote PowerShell and Remote Desktop via WAC.
-- Validating and troubleshooting hybrid management connectivity.
 
 ## Steps Performed
 
