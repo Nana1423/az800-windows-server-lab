@@ -89,10 +89,42 @@ In this lab, I worked with the next AZ-800 skills:
 
 4. **Registering WAC with Azure**
 
-    Now that we have setup the VM, we need to establish a hybrid connectivity between the on-premises server and the Azure VM created.
-    For this purpose, we'll use the Azure Network Adapter feature of WAC.
+    Now that the VM is set up, we need to establish hybrid connectivity between the on-premises server and the Azure VM. To accomplish this, we’ll use the Azure Network Adapter feature in WAC.
 
-    For this step, we'll make use tof `SEA-SVR1` with the WAC installed on `Lab3`, so I added a Azure Network Adapter from WAC.
+    For this step, we used SEA-SVR1 with WAC installed on Lab3 and attempted to add an Azure Network Adapter. However, due to limitations in the Azure Trial subscription, the process could not be completed. The following error was encountered:
+
+    "Error: Cannot create more than 0 IPv4 Basic SKU public IP addresses."
+
+5. **Verifying functionality of the Windows Admin Center gateway in Azure**
+
+    Once this is done, we can open our Azure VM and establish a PowerShell Remoting connection to our on-prem SEA-SVR1.
+
+    We’ll start by enabling WinRM:
+
+        winrm quickconfig
+
+    Then we set a firewall rule to allow inbound traffic for the Windows Remote Management service:
+
+        Set-NetFirewallRule `
+        -Name WINRM-HTTP-In-TCP-PUBLIC `
+        -RemoteAddress Any 
+
+    Finally, we enable PowerShell Remoting:
+
+        Enable-PSRemoting -Force -SkipNetworkProfileCheck
+
+    We can verify this by running the following:
+
+        Get-Service WinRM
+
+6. **Connect to an Azure VM by using the Windows Admin Center gateway running in Azure VM**
+
+    On SEA-SVR1, we can open WAC and add a connection to our Azure VM az800l04-vmwac, enter our credentials, and connect successfully.
+
+    Unfortunately, I was unable to capture a screenshot due to the trial subscription limitations described in Step 4, specifically the error:
+
+    "Error: Cannot create more than 0 IPv4 Basic public IP addresses."
+
 
 
 ## Troubleshooting / Errors Encountered
@@ -102,6 +134,12 @@ I initially attempted to start a Cloud Shell session using a domain admin accoun
 
 To resolve the issue, I signed in with an account that had Owner permissions and assigned the required roles (Owner or Contributor) to the domain admin user at the subscription level. After that, Cloud Shell started successfully.
 ![](./images/Cloud_Session_Unathorized.png)
+
+
+### Error: Cannot create more than 0 IPv4 Basic public IP addresses
+This error occurs when the WAC it's unable to create Public IP addresses for Standard SKU, I was able to verify this by looking at My Subscription -> Usage + Quotas. Only way to fix this it's by upgrading my current plan.
+
+![alt text](./images/Error_PublicIP.png)
 
 ## Documentation
 - https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/overview
