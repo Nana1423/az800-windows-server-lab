@@ -10,30 +10,24 @@ The primary goal of this lab is to use **WAC as a unified management plane** tha
 In this lab, I worked with the next AZ-800 skills:
 
 ### Administration of Windows Server workloads in a hybrid environment 
-- Configure a target machine for Windows Admin Center  
-- Configure remote PowerShell communication  
-- Configure Kerberos delegation or CredSSP for second-hop remoting  
-- Manage Windows servers using Azure Arc  
-- Integrate Windows servers with Log Analytics  
-- Integrate Windows servers with Microsoft Defender for Cloud  
-- Administer Azure Virtual Machines running Windows Server  
-- Implement Azure Automation for hybrid workloads  
-- Create runbooks to automate tasks  
+    - Configure a target machine for Windows Admin Center  
+    - Configure remote PowerShell communication  
+    - Configure Kerberos delegation or CredSSP for second-hop remoting  
+    - Administer Azure Virtual Machines running Windows Server  
 
 ### Implementing and managing a hybrid and local network infrastructure
-- Implement and manage Azure Network Adapter  
-- Implement hybrid network connectivity  
-- Configure and manage NVA-based routing between on-premises and Azure  
-- Resolve connectivity issues across hybrid endpoints  
+    - Implement and manage Azure Network Adapter  
+    - Implement hybrid network connectivity  
+    - Configure and manage NVA-based routing between on-premises and Azure  
+    - Resolve connectivity issues across hybrid endpoints  
 
 ### Manage virtual machines and containers
-- Manage Azure VM network configuration  
-- Configure connections to Azure VMs (RDP, WinRM)  
+    - Manage Azure VM network configuration  
+    - Configure connections to Azure VMs (RDP, WinRM)  
 
 ### Active Directory Domain Services — Hybrid Identity 
-- Administer authentication in hybrid environments  
-- Integrate servers with Microsoft Entra ID via Arc onboarding  
-- Configure Microsoft Entra authentication for WAC gateway access  
+    - Administer authentication in hybrid environments  
+    - Configure Microsoft Entra authentication for WAC gateway access  
 
 ## Objetives
 - Test hybrid connectivity by using Azure Network Adapter.
