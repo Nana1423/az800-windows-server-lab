@@ -1,0 +1,371 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus2"
+        },
+        "networkInterfaceName": {
+            "value": "az800l06-vm0832"
+        },
+        "subnetId": {
+            "value": "/subscriptions/b3263ee1-7a30-40dc-857a-601418217d1b/resourceGroups/AZ800-L0601-RG/providers/Microsoft.Network/virtualNetworks/az800L06-vnet/subnets/subnet0"
+        },
+        "publicIpAddressName": {
+            "value": "az800L06-vm0-ip"
+        },
+        "publicIpAddressType": {
+            "value": "Static"
+        },
+        "publicIpAddressSku": {
+            "value": "Standard"
+        },
+        "pipDeleteOption": {
+            "value": "Detach"
+        },
+        "virtualMachineName": {
+            "value": "az800L06-vm0"
+        },
+        "virtualMachineComputerName": {
+            "value": "az800L06-vm0"
+        },
+        "virtualMachineRG": {
+            "value": "AZ800-L0601-RG"
+        },
+        "osDiskType": {
+            "value": "Standard_LRS"
+        },
+        "osDiskDeleteOption": {
+            "value": "Delete"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_B1s"
+        },
+        "nicDeleteOption": {
+            "value": "Detach"
+        },
+        "hibernationEnabled": {
+            "value": false
+        },
+        "adminUsername": {
+            "value": "engineerleite"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "patchMode": {
+            "value": "AutomaticByPlatform"
+        },
+        "enablePeriodicAssessment": {
+            "value": "ImageDefault"
+        },
+        "enableHotpatching": {
+            "value": true
+        },
+        "rebootSetting": {
+            "value": "IfRequired"
+        },
+        "securityType": {
+            "value": "TrustedLaunch"
+        },
+        "secureBoot": {
+            "value": true
+        },
+        "vTPM": {
+            "value": true
+        },
+        "vnetLocation": {
+            "value": "eastus2"
+        },
+        "vnetExtendedLocation": {
+            "value": {}
+        },
+        "vnetVirtualNetworkName": {
+            "value": "az800L06-vnet"
+        },
+        "vnetResourceGroupName": {
+            "value": "AZ800-L0601-RG"
+        },
+        "vnetDeploymentName": {
+            "value": "network-interface-associated-virtual-network-20251121214241"
+        },
+        "vnetNatGatewaysWithNewPublicIpAddress": {
+            "value": []
+        },
+        "vnetNatGatewaysWithoutNewPublicIpAddress": {
+            "value": []
+        },
+        "vnetNatGatewayPublicIpAddressesNewNames": {
+            "value": []
+        },
+        "vnetNetworkSecurityGroupsNew": {
+            "value": []
+        },
+        "vnetProperties": {
+            "value": {
+                "subnets": [
+                    {
+                        "name": "subnet0",
+                        "properties": {
+                            "addressPrefixes": [
+                                "10.60.0.0/24"
+                            ],
+                            "ipamPoolPrefixAllocations": []
+                        }
+                    }
+                ],
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.60.0.0/20"
+                    ]
+                }
+            }
+        }
+    },
+    "variables": {
+        "subnetRef": "[parameters('subnetId')]",
+        "vnetName": "[parameters('vnetVirtualNetworkName')]",
+        "standardSku": {
+            "name": "Standard"
+        },
+        "vnetStaticAllocation": {
+            "publicIPAllocationMethod": "Static"
+        },
+        "vnetPremiumTier": {
+            "tier": "Premium"
+        },
+        "vnetPublicIpAddressesTags": "[if(contains(parameters('vnetTagsByResource'), 'Microsoft.Network/publicIpAddresses'), parameters('vnetTagsByResource')['Microsoft.Network/publicIpAddresses'], json('{}'))]",
+        "vnetNatGatewayTags": "[if(contains(parameters('vnetTagsByResource'), 'Microsoft.Network/natGateways'), parameters('vnetTagsByResource')['Microsoft.Network/natGateways'], json('{}'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('virtualMachineName'), '/customScriptExtension')]",
+            "apiVersion": "2018-06-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.7",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "commandToExecute": "powershell.exe Install-WindowsFeature -name Web-Server -IncludeManagementTools && powershell.exe remove-item 'C:\\inetpub\\wwwroot\\iisstart.htm' && powershell.exe Add-Content -Path 'C:\\inetpub\\wwwroot\\iisstart.htm' -Value $('Hello World from ' + $env:computername)"
+            }
+            }
+        },
+        {
+            "name": "[parameters('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2022-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]",
+                "[parameters('vnetDeploymentName')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName'))]",
+                                "properties": {
+                                    "deleteOption": "[parameters('pipDeleteOption')]"
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2023-06-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            },
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            }
+        },
+        {
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2024-03-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        },
+                        "deleteOption": "[parameters('osDiskDeleteOption')]"
+                    },
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2022-datacenter-azure-edition-hotpatch",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]",
+                            "properties": {
+                                "deleteOption": "[parameters('nicDeleteOption')]"
+                            }
+                        }
+                    ]
+                },
+                "securityProfile": {
+                    "securityType": "[parameters('securityType')]",
+                    "uefiSettings": {
+                        "secureBootEnabled": "[parameters('secureBoot')]",
+                        "vTpmEnabled": "[parameters('vTPM')]"
+                    }
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineComputerName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsConfiguration": {
+                        "enableAutomaticUpdates": true,
+                        "provisionVmAgent": true,
+                        "patchSettings": {
+                            "patchMode": "[parameters('patchMode')]",
+                            "assessmentMode": "[parameters('enablePeriodicAssessment')]",
+                            "enableHotpatching": "[parameters('enableHotpatching')]",
+                            "automaticByPlatformSettings": {
+                                "rebootSetting": "[parameters('rebootSetting')]"
+                            }
+                        }
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "[parameters('vnetDeploymentName')]",
+            "resourceGroup": "[parameters('vnetResourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "apiVersion": "2024-01-01",
+                            "name": "[parameters('vnetVirtualNetworkName')]",
+                            "location": "[parameters('vnetLocation')]",
+                            "extendedLocation": "[if(empty(parameters('vnetExtendedLocation')), json('null'), parameters('vnetExtendedLocation'))]",
+                            "tags": "[if(empty(parameters('vnetTagsByResource')), json('{}'), parameters('vnetTagsByResource'))]",
+                            "properties": "[parameters('vnetProperties')]"
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "[parameters('vnetDeploymentName')]",
+                "count": 1
+            },
+            "dependsOn": [
+                "natGatewaysWithNewPublicIpAddressCopy",
+                "natGatewaysWithoutNewPublicIpAddressCopy",
+                "networkSecurityGroupsCopy",
+                "natGatewayPublicIpAddressesCopy",
+                "natGatewayPublicIpAddressesCopy"
+            ]
+        },
+        {
+            "condition": "[greater(length(parameters('vnetNatGatewaysWithoutNewPublicIpAddress')), 0)]",
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/natGateways",
+            "name": "[parameters('vnetNatGatewaysWithoutNewPublicIpAddress')[copyIndex()].name]",
+            "location": "[parameters('vnetLocation')]",
+            "tags": "[variables('vnetNatGatewayTags')]",
+            "sku": "[variables('standardSku')]",
+            "properties": "[parameters('vnetNatGatewaysWithoutNewPublicIpAddress')[copyIndex()].properties]",
+            "copy": {
+                "name": "natGatewaysWithoutNewPublicIpAddressCopy",
+                "count": "[length(parameters('vnetNatGatewaysWithoutNewPublicIpAddress'))]"
+            }
+        },
+        {
+            "condition": "[greater(length(parameters('vnetNatGatewaysWithNewPublicIpAddress')), 0)]",
+            "apiVersion": "2019-09-01",
+            "type": "Microsoft.Network/natGateways",
+            "name": "[parameters('vnetNatGatewaysWithNewPublicIpAddress')[copyIndex()].name]",
+            "location": "[parameters('vnetLocation')]",
+            "tags": "[variables('vnetNatGatewayTags')]",
+            "sku": "[variables('standardSku')]",
+            "properties": "[parameters('vnetNatGatewaysWithNewPublicIpAddress')[copyIndex()].properties]",
+            "dependsOn": [
+                "natGatewayPublicIpAddressesCopy"
+            ],
+            "copy": {
+                "name": "natGatewaysWithNewPublicIpAddressCopy",
+                "count": "[length(parameters('vnetNatGatewaysWithNewPublicIpAddress'))]"
+            }
+        },
+        {
+            "condition": "[greater(length(parameters('vnetNatGatewayPublicIpAddressesNewNames')), 0)]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('vnetNatGatewayPublicIpAddressesNewNames')[copyIndex()]]",
+            "location": "[parameters('vnetLocation')]",
+            "sku": "[variables('standardSku')]",
+            "tags": "[variables('vnetPublicIpAddressesTags')]",
+            "properties": "[variables('vnetStaticAllocation')]",
+            "copy": {
+                "name": "natGatewayPublicIpAddressesCopy",
+                "count": "[length(parameters('vnetNatGatewayPublicIpAddressesNewNames'))]"
+            }
+        },
+        {
+            "condition": "[greater(length(parameters('vnetNetworkSecurityGroupsNew')), 0)]",
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('vnetNetworkSecurityGroupsNew')[copyIndex()].name]",
+            "location": "[parameters('vnetLocation')]",
+            "tags": "[if(contains(parameters('vnetTagsByResource'), 'Microsoft.Network/networkSecurityGroups'), parameters('vnetTagsByResource')['Microsoft.Network/networkSecurityGroups'], json('{}'))]",
+            "properties": {},
+            "copy": {
+                "name": "networkSecurityGroupsCopy",
+                "count": "[length(parameters('vnetNetworkSecurityGroupsNew'))]"
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
